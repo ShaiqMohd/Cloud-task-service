@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"net/http"
 )
 
@@ -19,6 +20,7 @@ func main() {
 	})
 
 	http.HandleFunc("/tasks", func(w http.ResponseWriter, r *http.Request) {
+
 		if r.Method == http.MethodPost {
 			task := Task{
 				ID:    currentID,
@@ -30,6 +32,14 @@ func main() {
 			w.Write([]byte("Task Created"))
 			return
 		}
+
+		if r.Method == http.MethodGet {
+			w.Header().Set("Content-Type", "application/json")
+			json.NewEncoder(w).Encode(tasks)
+			return
+		}
+
+		w.WriteHeader(http.StatusMethodNotAllowed)
 		w.Write([]byte("Method Not Allowed"))
 	})
 
