@@ -22,14 +22,20 @@ func main() {
 	http.HandleFunc("/tasks", func(w http.ResponseWriter, r *http.Request) {
 
 		if r.Method == http.MethodPost {
-			task := Task{
-				ID:    currentID,
-				Title: "Sample Task",
-				Done:  false,
+			var task Task
+
+			err := json.NewDecoder(r.Body).Decode(&task)
+			if err != nil {
+				http.Error(w, "Invalid JSON", http.StatusBadRequest)
+				return
 			}
+
+			task.ID = currentID
 			tasks[currentID] = task
 			currentID++
-			w.Write([]byte("Task Created"))
+
+			w.Header().Set("Content-Type", "application/json")
+			json.NewEncoder(w).Encode(task)
 			return
 		}
 
