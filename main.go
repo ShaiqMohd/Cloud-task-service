@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"net/http"
+	"strconv"
 )
 
 type Task struct {
@@ -40,6 +41,25 @@ func main() {
 		}
 
 		if r.Method == http.MethodGet {
+			idStr := r.URL.Query().Get("id")
+
+			if idStr != "" {
+				id, err := strconv.Atoi(idStr)
+				if err != nil {
+					http.Error(w, "Invalid ID", http.StatusBadRequest)
+					return
+				}
+
+				task, exists := tasks[id]
+				if !exists {
+					http.Error(w, "Task not found", http.StatusNotFound)
+					return
+				}
+
+				w.Header().Set("Content-Type", "appplication/json")
+				json.NewEncoder(w).Encode(task)
+				return
+			}
 			w.Header().Set("Content-Type", "application/json")
 			json.NewEncoder(w).Encode(tasks)
 			return
