@@ -65,6 +65,30 @@ func main() {
 			return
 		}
 
+		if r.Method == http.MethodDelete {
+			idstr := r.URL.Query().Get("id")
+
+			if idstr == "" {
+				http.Error(w, "Task ID required", http.StatusBadRequest)
+				return
+			}
+
+			id, err := strconv.Atoi(idstr)
+			if err != nil {
+				http.Error(w, "Invalid ID", http.StatusBadRequest)
+			}
+
+			_, exists := tasks[id]
+			if !exists {
+				http.Error(w, "Task not found", http.StatusNotFound)
+			}
+
+			delete(tasks, id)
+
+			w.Write([]byte("Task deleted"))
+			return
+		}
+
 		w.WriteHeader(http.StatusMethodNotAllowed)
 		w.Write([]byte("Method Not Allowed"))
 	})
