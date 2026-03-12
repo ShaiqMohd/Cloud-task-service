@@ -20,6 +20,8 @@ func main() {
 		w.Write([]byte("OK"))
 	})
 
+	//CRUD Logic
+
 	http.HandleFunc("/tasks", func(w http.ResponseWriter, r *http.Request) {
 
 		if r.Method == http.MethodPost {
@@ -86,6 +88,43 @@ func main() {
 			delete(tasks, id)
 
 			w.Write([]byte("Task deleted"))
+			return
+		}
+
+		if r.Method == http.MethodPut {
+			idstr := r.URL.Query().Get("id")
+
+			if idstr == "" {
+				http.Error(w, "Task ID required", http.StatusBadRequest)
+				return
+			}
+
+			id, err := strconv.Atoi(idstr)
+			if err != nil {
+				http.Error(w, "Invalid ID", http.StatusBadRequest)
+				return
+			}
+
+			task, exists := tasks[id]
+			if !exists {
+				http.Error(w, "Task not found", http.StatusNotFound)
+				return
+			}
+
+			var updatedTask Task
+			err = json.NewDecoder(r.Body).Decode(&updatedTask)
+			if err != nil {
+				http.Error(w, "Invalid JSON", http.StatusBadRequest)
+				return
+			}
+
+			task.Title = updatedTask.Title
+			task.Done = updatedTask.Done
+
+			tasks[id] = task
+
+			w.Header().Set("Content-Type", "application/json")
+			json.NewEncoder(w).Encode(task)
 			return
 		}
 
