@@ -22,9 +22,16 @@ func TaskHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		task.ID = storage.CurrentID
-		storage.Tasks[storage.CurrentID] = task
-		storage.CurrentID++
+		query := "INSERT INTO tasks (title, done) VALUES ($1, $2) RETURNING id"
+
+		var id int
+		err = storage.DB.QueryRow(query, task.Title, task.Done).Scan(&id)
+		if err != nil {
+			http.Error(w, "DB error", http.StatusInternalServerError)
+			return
+		}
+
+		task.ID = id
 
 		w.Header().Set("Content-Type", "application/json")
 		json.NewEncoder(w).Encode(task)
@@ -41,18 +48,38 @@ func TaskHandler(w http.ResponseWriter, r *http.Request) {
 				return
 			}
 
-			task, exists := storage.Tasks[id]
-			if !exists {
+			var task models.Task
+
+			query := "SELECT id, title, done FROM tasks WHERE id=$1"
+			err = storage.DB.QueryRow(query, id).Scan(&task.ID, &task.Title, &task.Done)
+
+			if err != nil {
 				http.Error(w, "Task not found", http.StatusNotFound)
 				return
 			}
 
-			w.Header().Set("Content-Type", "appplication/json")
+			w.Header().Set("Content-Type", "application/json")
 			json.NewEncoder(w).Encode(task)
 			return
 		}
+		// Get all tasks
+		rows, err := storage.DB.Query("SELECT id, title, done FROM tasks")
+		if err != nil {
+			http.Error(w, "DB error", http.StatusInternalServerError)
+			return
+		}
+		defer rows.Close()
+
+		var tasks []models.Task
+
+		for rows.Next() {
+			var t models.Task
+			rows.Scan(&t.ID, &t.Title, &t.Done)
+			tasks = append(tasks, t)
+		}
+
 		w.Header().Set("Content-Type", "application/json")
-		json.NewEncoder(w).Encode(storage.Tasks)
+		json.NewEncoder(w).Encode(tasks)
 		return
 	}
 
@@ -67,14 +94,15 @@ func TaskHandler(w http.ResponseWriter, r *http.Request) {
 		id, err := strconv.Atoi(idstr)
 		if err != nil {
 			http.Error(w, "Invalid ID", http.StatusBadRequest)
+			return
 		}
 
-		_, exists := storage.Tasks[id]
-		if !exists {
-			http.Error(w, "Task not found", http.StatusNotFound)
+		query := "DELETE FROM tasks WHERE id=$1"
+		_, err = storage.DB.Exec(query, id)
+		if err != nil {
+			http.Error(w, "DB error", http.StatusInternalServerError)
+			return
 		}
-
-		delete(storage.Tasks, id)
 
 		w.Write([]byte("Task deleted"))
 		return
@@ -94,12 +122,6 @@ func TaskHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		task, exists := storage.Tasks[id]
-		if !exists {
-			http.Error(w, "Task not found", http.StatusNotFound)
-			return
-		}
-
 		var updatedTask models.Task
 		err = json.NewDecoder(r.Body).Decode(&updatedTask)
 		if err != nil {
@@ -107,13 +129,14 @@ func TaskHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		task.Title = updatedTask.Title
-		task.Done = updatedTask.Done
+		query := "UPDATE tasks SET title=$1, done=$2 WHERE id=$3"
+		_, err = storage.DB.Exec(query, updatedTask.Title, updatedTask.Done, id)
+		if err != nil {
+			http.Error(w, "DB error", http.StatusInternalServerError)
+			return
+		}
 
-		storage.Tasks[id] = task
-
-		w.Header().Set("Content-Type", "application/json")
-		json.NewEncoder(w).Encode(task)
+		w.Write([]byte("Task updated"))
 		return
 	}
 
