@@ -22,16 +22,11 @@ func TaskHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		query := "INSERT INTO tasks (title, done) VALUES ($1, $2) RETURNING id"
-
-		var id int
-		err = storage.DB.QueryRow(query, task.Title, task.Done).Scan(&id)
+		task, err = storage.CreateTask(task.Title, task.Done)
 		if err != nil {
 			http.Error(w, "DB error", http.StatusInternalServerError)
 			return
 		}
-
-		task.ID = id
 
 		w.Header().Set("Content-Type", "application/json")
 		json.NewEncoder(w).Encode(task)
@@ -48,11 +43,7 @@ func TaskHandler(w http.ResponseWriter, r *http.Request) {
 				return
 			}
 
-			var task models.Task
-
-			query := "SELECT id, title, done FROM tasks WHERE id=$1"
-			err = storage.DB.QueryRow(query, id).Scan(&task.ID, &task.Title, &task.Done)
-
+			task, err := storage.GetTaskByID(id)
 			if err != nil {
 				http.Error(w, "Task not found", http.StatusNotFound)
 				return
@@ -63,21 +54,11 @@ func TaskHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		// Get all tasks
-		rows, err := storage.DB.Query("SELECT id, title, done FROM tasks")
+		tasks, err := storage.GetAllTasks()
 		if err != nil {
 			http.Error(w, "DB error", http.StatusInternalServerError)
 			return
 		}
-		defer rows.Close()
-
-		var tasks []models.Task
-
-		for rows.Next() {
-			var t models.Task
-			rows.Scan(&t.ID, &t.Title, &t.Done)
-			tasks = append(tasks, t)
-		}
-
 		w.Header().Set("Content-Type", "application/json")
 		json.NewEncoder(w).Encode(tasks)
 		return
@@ -97,8 +78,7 @@ func TaskHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		query := "DELETE FROM tasks WHERE id=$1"
-		_, err = storage.DB.Exec(query, id)
+		err = storage.DeleteTask(id)
 		if err != nil {
 			http.Error(w, "DB error", http.StatusInternalServerError)
 			return
@@ -129,8 +109,12 @@ func TaskHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		query := "UPDATE tasks SET title=$1, done=$2 WHERE id=$3"
-		_, err = storage.DB.Exec(query, updatedTask.Title, updatedTask.Done, id)
+		err = storage.UpdateTask(
+			id,
+			updatedTask.Title,
+			updatedTask.Done,
+		)
+
 		if err != nil {
 			http.Error(w, "DB error", http.StatusInternalServerError)
 			return
