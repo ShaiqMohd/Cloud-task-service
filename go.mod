@@ -2,4 +2,7 @@ module cloud-task-service
 
 go 1.25.7
 
-require github.com/lib/pq v1.12.1 // indirect
+require (
+	github.com/joho/godotenv v1.5.1 // indirect
+	github.com/lib/pq v1.12.1 // indirect
+)

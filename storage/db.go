@@ -2,17 +2,31 @@ package storage
 
 import (
 	"database/sql"
+	"fmt"
 	"log"
+	"os"
 
 	"cloud-task-service/models"
 
+	"github.com/joho/godotenv"
 	_ "github.com/lib/pq"
 )
 
 var DB *sql.DB
 
 func InitDB() {
-	connStr := "postgres://postgres:password@db:5432/tasksdb?sslmode=disable"
+	err1 := godotenv.Load()
+	if err1 != nil {
+		log.Println("No .env file found")
+	}
+	connStr := fmt.Sprintf(
+		"postgres://%s:%s@%s:%s/%s?sslmode=disable",
+		os.Getenv("DB_USER"),
+		os.Getenv("DB_PASSWORD"),
+		os.Getenv("DB_HOST"),
+		os.Getenv("DB_PORT"),
+		os.Getenv("DB_NAME"),
+	)
 
 	var err error
 	DB, err = sql.Open("postgres", connStr)
