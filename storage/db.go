@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"time"
 
 	"cloud-task-service/models"
 
@@ -34,7 +35,16 @@ func InitDB() {
 		log.Fatal(err)
 	}
 
-	err = DB.Ping()
+	for i := 0; i < 10; i++ {
+		err = DB.Ping()
+		if err == nil {
+			break
+		}
+
+		log.Println("Waiting for database...")
+		time.Sleep(2 * time.Second)
+	}
+
 	if err != nil {
 		log.Fatal(err)
 	}
