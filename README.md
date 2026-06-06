@@ -1,54 +1,62 @@
-# Cloud Task Service (Go REST API)
+# Cloud Task Service
 
-A simple RESTful Task Management API built using **Go's net/http package**.
-This project demonstrates backend fundamentals such as HTTP routing, JSON request/response handling, CRUD operations, and in-memory data storage.
+A RESTful Task Management API built with Go, PostgreSQL, and Docker.
 
-The project is part of my learning journey in **Backend Development, Cloud, and DevOps**.
+This project demonstrates backend development fundamentals including REST APIs, CRUD operations, database integration, environment-based configuration, containerization, and service orchestration using Docker Compose.
 
----
+## Features
 
-Features
-
-* Health check endpoint
-* Create tasks using JSON input
+* Create tasks
 * Retrieve all tasks
-* Retrieve a specific task by ID
+* Retrieve a task by ID
+* Update tasks
 * Delete tasks
-* Proper HTTP status responses
-* JSON request and response handling
+* PostgreSQL persistence
+* Dockerized application
+* Docker Compose multi-container setup
+* Environment variable configuration
+* Health check endpoint
 
+## Tech Stack
 
-Tech Stack
+* Go
+* PostgreSQL
+* Docker
+* Docker Compose
+* REST API
+* JSON
 
-Language: Go
-HTTP Server: net/http
-Data Format: JSON
-Storage: In-memory (map)
+## Project Structure
 
+```text
+cloud-task-service
+│
+├── handlers
+├── models
+├── storage
+│   └── db.go
+├── Dockerfile
+├── docker-compose.yml
+├── .gitignore
+├── main.go
+└── README.md
+```
 
 ## API Endpoints
 
 ### Health Check
 
-```
+```http
 GET /health
 ```
 
-Response:
-
-```
-OK
-```
-
----
-
 ### Create Task
 
-```
+```http
 POST /tasks
 ```
 
-Request Body:
+Request:
 
 ```json
 {
@@ -56,129 +64,93 @@ Request Body:
   "done": false
 }
 ```
-
-Response:
-
-```json
-{
-  "id": 1,
-  "title": "Study Go",
-  "done": false
-}
-```
-
----
 
 ### Get All Tasks
 
-```
+```http
 GET /tasks
 ```
 
-Response:
+### Get Task By ID
 
-```json
-{
-  "1": {
-    "id": 1,
-    "title": "Study Go",
-    "done": false
-  }
-}
-```
-
----
-
-### Get Task by ID
-
-```
+```http
 GET /tasks?id=1
 ```
 
-Response:
+### Update Task
+
+```http
+PUT /tasks?id=1
+```
+
+Request:
 
 ```json
 {
-  "id": 1,
-  "title": "Study Go",
-  "done": false
+  "title": "Study Docker",
+  "done": true
 }
 ```
 
----
-
 ### Delete Task
 
-```
+```http
 DELETE /tasks?id=1
 ```
 
-Response:
-
-```
-Task deleted
-```
-
----
-
 ## Running the Project
 
-Clone the repository:
+### Using Docker Compose
 
-```
-git clone https://github.com/YOUR_USERNAME/cloud-task-service.git
-```
-
-Navigate to the project folder:
-
-```
-cd cloud-task-service
+```bash
+docker compose up --build
 ```
 
-Run the server:
+Application:
 
-```
-go run main.go
-```
-
-The server will start on:
-
-```
+```text
 http://localhost:8080
 ```
 
----
+### Environment Variables
 
-## Example Workflow
+Create a `.env` file:
 
-1. Start the server
-2. Create tasks using Postman
-3. Retrieve tasks using browser or Postman
-4. Delete tasks via DELETE endpoint
+```env
+DB_USER=postgres
+DB_PASSWORD=password
+DB_NAME=tasksdb
+DB_HOST=db
+DB_PORT=5432
+```
 
----
+## Architecture
+
+```text
+Client
+  ↓
+Go REST API
+  ↓
+Storage Layer
+  ↓
+PostgreSQL
+```
+
+## Learning Objectives
+
+This project was built to strengthen skills in:
+
+* Backend Development
+* Database Integration
+* Docker & Containerization
+* Cloud Engineering
+* DevOps Fundamentals
 
 ## Future Improvements
 
-Planned improvements for this project:
-
-* Add **task update endpoint (PUT/PATCH)**
-* Add **persistent storage with PostgreSQL**
-* Containerize the application using **Docker**
-* Deploy the API to **AWS**
-* Add **CI/CD pipeline with GitHub Actions**
-* Provision infrastructure using **Terraform**
-
----
-
-## Learning Goals
-
-This project is part of my preparation for roles in:
-
-* Backend Development
-* Cloud Engineering
-* DevOps Engineering
-
-It focuses on building strong fundamentals in API design and cloud-native development.
-
----
+* AWS Deployment
+* GitHub Actions CI/CD
+* Terraform Infrastructure
+* Authentication & Authorization
+* API Documentation
+* Automated Testing
