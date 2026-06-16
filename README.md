@@ -154,3 +154,10 @@ This project was built to strengthen skills in:
 * Authentication & Authorization
 * API Documentation
 * Automated Testing
+
+## Deployment & CI/CD
+
+- Dockerized using Docker and Docker Compose
+- Deployed on AWS EC2
+- Configured Jenkins Pipeline for automated build and deployment
+- Managed environment variables using .env
