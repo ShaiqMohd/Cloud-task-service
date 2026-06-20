@@ -1,8 +1,10 @@
 # Cloud Task Service
 
-A RESTful Task Management API built with Go, PostgreSQL, and Docker.
+A cloud-based RESTful Task Management API built with Go, PostgreSQL, Docker, AWS EC2, and Jenkins.
 
-This project demonstrates backend development fundamentals including REST APIs, CRUD operations, database integration, environment-based configuration, containerization, and service orchestration using Docker Compose.
+This project demonstrates backend development fundamentals including REST APIs, CRUD operations, database integration, environment-based configuration, containerization, cloud deployment, and CI/CD automation.
+
+---
 
 ## Features
 
@@ -16,15 +18,23 @@ This project demonstrates backend development fundamentals including REST APIs, 
 * Docker Compose multi-container setup
 * Environment variable configuration
 * Health check endpoint
+* AWS EC2 deployment
+* Jenkins CI/CD pipeline integration
+
+---
 
 ## Tech Stack
 
-* Go
+* Go (Golang)
 * PostgreSQL
 * Docker
 * Docker Compose
+* AWS EC2
+* Jenkins
 * REST API
 * JSON
+
+---
 
 ## Project Structure
 
@@ -35,12 +45,16 @@ cloud-task-service
 ├── models
 ├── storage
 │   └── db.go
+├── screenshots
 ├── Dockerfile
 ├── docker-compose.yml
+├── Jenkinsfile
 ├── .gitignore
 ├── main.go
 └── README.md
 ```
+
+---
 
 ## API Endpoints
 
@@ -48,6 +62,12 @@ cloud-task-service
 
 ```http
 GET /health
+```
+
+Response:
+
+```text
+OK
 ```
 
 ### Create Task
@@ -98,6 +118,8 @@ Request:
 DELETE /tasks?id=1
 ```
 
+---
+
 ## Running the Project
 
 ### Using Docker Compose
@@ -112,7 +134,9 @@ Application:
 http://localhost:8080
 ```
 
-### Environment Variables
+---
+
+## Environment Variables
 
 Create a `.env` file:
 
@@ -124,43 +148,56 @@ DB_HOST=db
 DB_PORT=5432
 ```
 
+---
+
 ## Architecture
 
 ```text
 Client
-  ↓
+   │
+   ▼
 Go REST API
-  ↓
+   │
+   ▼
 Storage Layer
-  ↓
+   │
+   ▼
 PostgreSQL
 ```
 
-## Learning Objectives
+---
 
-This project was built to strengthen skills in:
+## Deployment Architecture
 
-* Backend Development
-* Database Integration
-* Docker & Containerization
-* Cloud Engineering
-* DevOps Fundamentals
+```text
+GitHub
+   │
+   ▼
+ Jenkins
+   │
+   ▼
+Docker Compose
+   │
+   ├── Go API Container
+   └── PostgreSQL Container
+           │
+           ▼
+        AWS EC2
+```
 
-## Future Improvements
-
-* AWS Deployment
-* GitHub Actions CI/CD
-* Terraform Infrastructure
-* Authentication & Authorization
-* API Documentation
-* Automated Testing
+---
 
 ## Deployment & CI/CD
 
-- Dockerized using Docker and Docker Compose
-- Deployed on AWS EC2
-- Configured Jenkins Pipeline for automated build and deployment
-- Managed environment variables using .env
+* Containerized the application using Docker and Docker Compose
+* Deployed the application on AWS EC2
+* Configured Jenkins for Continuous Integration and Continuous Deployment (CI/CD)
+* Automated source code retrieval from GitHub
+* Built Docker images through Jenkins pipeline stages
+* Managed database and application services using Docker Compose
+* Used environment-based configuration through `.env` files
+
+---
 
 ## Screenshots
 
@@ -190,30 +227,45 @@ This project was built to strengthen skills in:
 
 ### Jenkins Pipeline Build Logs
 
-![Jenkins Pipeline Logs](screenshots/jenkins-pipeline(2).png)
+![Jenkins Pipeline Logs](screenshots/jenkins-pipeline\(2\).png)
 
-## API Endpoint
+---
 
-### Health Check
+## Learning Objectives
 
-```http
-GET /health
-```
+This project was built to strengthen skills in:
 
-Response:
+* Backend Development
+* Database Integration
+* Docker & Containerization
+* Cloud Engineering
+* CI/CD Pipelines
+* DevOps Fundamentals
 
-```text
-OK
-```
+---
+
+## Future Improvements
+
+* Terraform Infrastructure as Code
+* Kubernetes Deployment
+* Authentication & Authorization
+* API Documentation (Swagger)
+* Automated Testing
+* Monitoring & Logging
+
+---
 
 ## Deployment Workflow
 
-1. Push code to GitHub
-2. Jenkins pulls latest source code
-3. Docker builds application image
+1. Developer pushes code to GitHub
+2. Jenkins pulls the latest source code
+3. Docker builds the application image
 4. Docker Compose deploys services
-5. Application becomes available on EC2
+5. PostgreSQL and Go API start on AWS EC2
+6. Application becomes accessible through public endpoints
+
+---
 
 ## Author
 
-Mohd Shaiq
+**Mohd Shaiq**
