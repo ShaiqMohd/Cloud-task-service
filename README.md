@@ -161,3 +161,59 @@ This project was built to strengthen skills in:
 - Deployed on AWS EC2
 - Configured Jenkins Pipeline for automated build and deployment
 - Managed environment variables using .env
+
+## Screenshots
+
+### AWS EC2 Instance Dashboard
+
+![EC2 Dashboard](screenshots/EC2-dashboard.png)
+
+### EC2 Server Access (SSH)
+
+![EC2 Console](screenshots/EC2-console.png)
+
+### Docker Containers and Images
+
+![Docker](screenshots/docker-containers-images.png)
+
+### Application Health Check
+
+![Health Check](screenshots/health-status.png)
+
+### Jenkins Dashboard
+
+![Jenkins Dashboard](screenshots/jenkins-dashboard.png)
+
+### Jenkins Pipeline Execution
+
+![Jenkins Pipeline](screenshots/jenkins-pipeline.png)
+
+### Jenkins Pipeline Build Logs
+
+![Jenkins Pipeline Logs](screenshots/jenkins-pipeline(2).png)
+
+## API Endpoint
+
+### Health Check
+
+```http
+GET /health
+```
+
+Response:
+
+```text
+OK
+```
+
+## Deployment Workflow
+
+1. Push code to GitHub
+2. Jenkins pulls latest source code
+3. Docker builds application image
+4. Docker Compose deploys services
+5. Application becomes available on EC2
+
+## Author
+
+Mohd Shaiq
