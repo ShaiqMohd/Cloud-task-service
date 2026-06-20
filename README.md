@@ -122,7 +122,7 @@ DELETE /tasks?id=1
 
 ## Running the Project
 
-### Using Docker Compose
+### using Docker Compose
 
 ```bash
 docker compose up --build
